@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sovereign Master: Private System</title>
+    <style>
+        :root { --neon-blue: #00d4ff; --dark-bg: #050a14; --card-bg: #111a2d; --accent: #ff4757; --gold: #f1c40f; }
+        body { background: var(--dark-bg); color: #e0e0e0; font-family: 'Orbitron', sans-serif; margin: 0; padding: 10px; overflow-x: hidden; }
+        header { text-align: center; border-bottom: 2px solid var(--neon-blue); padding: 20px; box-shadow: 0 0 15px var(--neon-blue); margin-bottom: 25px; }
+        .office-mode { display: block; width: 100%; padding: 10px; margin: 10px 0; border: 1px solid var(--gold); color: var(--gold); text-align: center; font-weight: bold; cursor: pointer; border-radius: 5px; text-transform: uppercase; letter-spacing: 2px; }
+        .office-active { background: var(--gold); color: #000; box-shadow: 0 0 10px var(--gold); }
+        .quest-card { background: var(--card-bg); border: 1px solid #222; border-left: 5px solid var(--neon-blue); border-radius: 10px; padding: 20px; margin-bottom: 20px; position: relative; transition: 0.3s; }
+        .quest-card:hover { transform: scale(1.02); border-color: var(--neon-blue); }
+        .level-tag { color: var(--neon-blue); font-size: 12px; font-weight: bold; border: 1px solid var(--neon-blue); padding: 2px 8px; border-radius: 4px; display: inline-block; margin-bottom: 10px; }
+        .task-name { font-size: 18px; font-weight: 800; color: #fff; text-transform: uppercase; margin-bottom: 5px; }
+        .logic { font-size: 13px; color: #888; font-style: italic; margin-bottom: 10px; }
+        .reward { color: #2ecc71; font-size: 14px; font-weight: bold; border-top: 1px solid #333; padding-top: 10px; margin-top: 10px; }
+        textarea { width: 100%; height: 70px; background: #000; color: #00ff41; border: 1px solid #444; border-radius: 5px; margin-top: 15px; padding: 10px; font-family: 'Courier New', monospace; box-sizing: border-box; }
+        .lock-btn { width: 100%; background: var(--neon-blue); color: #000; border: none; padding: 12px; font-weight: bold; cursor: pointer; margin-top: 10px; border-radius: 5px; text-transform: uppercase; }
+        .status-msg { text-align: center; font-size: 11px; color: var(--neon-blue); margin-top: 20px; opacity: 0.6; }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body onload="initSystem()">
+
+<header>
+    <div style="font-size: 10px; color: var(--accent); letter-spacing: 4px;">WARNING: PRIVATE INTERFACE</div>
+    <h1 style="margin: 5px 0;">SOVEREIGN MASTER</h1>
+    <div id="officeBtn" class="office-mode" onclick="toggleOffice()">System State: Standard</div>
+</header>
+
+<div id="questContainer"></div>
+
+<div class="status-msg">CONNECTED TO ARCHIVE: 127.0.0.1 // ENCRYPTED</div>
+
+<script>
+    const systemData = [
+        { name: "THE BEGINNING", task: "24 ghante mein ek buri aadat chhodein.", logic: "Discipline ki pehli seedhi tyag hai.", reward: "Level 1 Unlock + Welcome Badge" },
+        { name: "THE BODY TEMPLE", task: "15 min exercise ya yoga karein.", logic: "Mazboot dimaag mazboot sharir mein rehta hai.", reward: "Health XP +10" },
+        { name: "SILENCE SEARCHER", task: "5 min bina phone ke shanti se baithein.", logic: "Focus badhane ke liye khamoshi zaroori hai.", reward: "Concentration Power Up" },
+        { name: "WATER COMMANDER", task: "Din mein 4-5 litre paani piyein.", logic: "Energy levels ko maintain rakhne ke liye.", reward: "Hydration Master Badge" },
+        { name: "THE OBSERVER", task: "Kisi ajnabi ki 1 minute madad karein.", logic: "Insaniyat hi sabse bada system hai.", reward: "Kindness Point +5" },
+        { name: "DIGITAL FAST", task: "2 ghante ke liye social media band.", logic: "Dopamine levels ko control karna seekhein.", reward: "Focus Mode Unlock" },
+        { name: "THE MOMENTUM", task: "Agle 90 din ka self-challenge banayein.", logic: "Rukna matlab khatam hona.", reward: "Gati Badge" },
+        { name: "GUARDIAN'S VIGIL", task: "Parivaar ki ek nayi zimmedari lo.", logic: "Asli takat dhaal banne mein hai.", reward: "Guardian Status" },
+        { name: "MIRROR OF TRUTH", task: "Pehle kya the aur ab kya ho likho.", logic: "Bina imandari ke badlav temporary hai.", reward: "Truth Seeker Title" },
+        { name: "ETERNAL CYCLE", task: "Journey audit aur secret video dekho.", logic: "Ye ant nahi, ek naye safar ki shuruat hai.", reward: "Legendary Badge" }
+    ];
+
+    function speak(text) {
+        const synth = window.speechSynthesis;
+        const utter = new SpeechSynthesisUtterance(text);
+        utter.pitch = 0.8;
+        utter.rate = 0.9;
+        synth.speak(utter);
+    }
+
+    function initSystem() {
+        speak("System Online. Welcome back, Sovereign Master. All missions have been synchronized.");
+        renderQuests();
+    }
+
+    function renderQuests() {
+        const container = document.getElementById('questContainer');
+        systemData.forEach((q, i) => {
+            const savedData = localStorage.getItem('master_quest_' + i) || "";
+            container.innerHTML += `
+                <div class="quest-card">
+                    <div class="level-tag">LEVEL 0${i+1}</div>
+                    <div class="task-name">${q.name}</div>
+                    <div style="margin: 10px 0;">${q.task}</div>
+                    <div class="logic">Logic: ${q.logic}</div>
+                    <div class="reward">REWARD: ${q.reward}</div>
+                    <textarea id="text-${i}" placeholder="Enter Progress Report...">${savedData}</textarea>
+                    <button class="lock-btn" onclick="lockQuest(${i})">SYNC TO SYSTEM</button>
+                </div>
+            `;
+        });
+    }
+
+    function lockQuest(id) {
+        const report = document.getElementById('text-' + id).value;
+        localStorage.setItem('master_quest_' + id, report);
+        speak("Data Synced. Level " + (id+1) + " progress has been recorded in the archive.");
+        alert("System Update: Progress Recorded.");
+    }
+
+    function toggleOffice() {
+        const btn = document.getElementById('officeBtn');
+        const isActive = btn.classList.toggle('office-active');
+        if(isActive) {
+            btn.innerText = "System State: Office Mode Active";
+            speak("Office mode activated. All distractions suppressed. Focus on your objectives, Master.");
+        } else {
+            btn.innerText = "System State: Standard";
+            speak("Returning to standard operation mode.");
+        }
+    }
+</script>
+</body>
+</html>
+
